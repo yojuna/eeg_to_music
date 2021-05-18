@@ -36,8 +36,8 @@ embedding_size = 69
 # cleaners='english_cleaners'
 
 # data_path = './data/LJSpeech-1.1'
-# data_path = '/home/archeron/dev/data/eeg_to_music_data/LJSpeech-1.1'
-data_path = '/home/archeron/dev/data/eeg_to_music_data'
+# data_path = '~/dev/data/eeg_to_music_data/LJSpeech-1.1'
+data_path = '~/dev/data/eeg_to_music_data'
 npz_filename = 'P01_extracted.npz'
 checkpoint_path = data_path + '/checkpoint'
 sample_path = data_path + '/samples'
