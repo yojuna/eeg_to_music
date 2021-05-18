@@ -4,14 +4,18 @@
 ---
 
   WORK IN PROGRESS!! DOES NOT WORK!!
+
 '===================================='
 
 
 FORK of https://github.com/soobinseo/Transformer-TTS
+
 Modified to work with raw EEG fif data.
+
 Beware of weird print statements.
 
 openMIIR dataset github page: https://github.com/sstober/openmiir
+
 
 ---
 
