@@ -1,0 +1,345 @@
+
+18/05/21 16:00
+
+status:
+    dataloader has been modified for eeg;
+    error is being thrown at mask dimension definition at attention module layer
+        plus the below weird errors not yet explored.
+
+3 different errors on same run without any changes in code :/
+---------------------------------------------------------------
+
+Traceback (most recent call last):
+  File "train_transformer.py", line 128, in <module>
+    main()
+  File "train_transformer.py", line 58, in main
+    mel_pred, postnet_pred, attn_probs, stop_preds, attns_enc, attns_dec = m.forward(eeg_array, mel_input, pos_eeg_signal, pos_mel)
+  File "/home/archeron/anaconda3/lib/python3.7/site-packages/torch/nn/parallel/data_parallel.py", line 153, in forward
+    return self.module(*inputs[0], **kwargs[0])
+  File "/home/archeron/anaconda3/lib/python3.7/site-packages/torch/nn/modules/module.py", line 722, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/home/archeron/dev/repos/eeg_to_music/transformer_tts_master/network.py", line 22, in forward
+    memory, c_mask, attns_enc = self.encoder.forward(eeg_array, pos=pos_eeg_signal)
+  File "/home/archeron/dev/repos/eeg_to_music/transformer_tts_master/network.py", line 87, in forward
+    x, attn = layer(x, x, mask=mask, query_mask=c_mask)
+  File "/home/archeron/anaconda3/lib/python3.7/site-packages/torch/nn/modules/module.py", line 722, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/home/archeron/dev/repos/eeg_to_music/transformer_tts_master/module.py", line 278, in forward
+    result, attns = self.multihead(key, value, query, mask=mask, query_mask=query_mask)
+  File "/home/archeron/anaconda3/lib/python3.7/site-packages/torch/nn/modules/module.py", line 722, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/home/archeron/dev/repos/eeg_to_music/transformer_tts_master/module.py", line 210, in forward
+    attn = attn.masked_fill(mask, -2 ** 32 + 1)
+RuntimeError: The size of tensor a (69) must match the size of tensor b (5050) at non-singleton dimension 1
+Processing at epoch 0:   0%|  
+
+---------------
+
+encprenet out shape:  torch.Size([2, 8371, 256])
+....
+
+Traceback (most recent call last):
+  File "train_transformer.py", line 128, in <module>
+    main()
+  File "train_transformer.py", line 58, in main
+    mel_pred, postnet_pred, attn_probs, stop_preds, attns_enc, attns_dec = m.forward(eeg_array, mel_input, pos_eeg_signal, pos_mel)
+  File "/home/archeron/anaconda3/lib/python3.7/site-packages/torch/nn/parallel/data_parallel.py", line 153, in forward
+    return self.module(*inputs[0], **kwargs[0])
+  File "/home/archeron/anaconda3/lib/python3.7/site-packages/torch/nn/modules/module.py", line 722, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/home/archeron/dev/repos/eeg_to_music/transformer_tts_master/network.py", line 22, in forward
+    memory, c_mask, attns_enc = self.encoder.forward(eeg_array, pos=pos_eeg_signal)
+  File "/home/archeron/dev/repos/eeg_to_music/transformer_tts_master/network.py", line 87, in forward
+    x, attn = layer(x, x, mask=mask, query_mask=c_mask)
+  File "/home/archeron/anaconda3/lib/python3.7/site-packages/torch/nn/modules/module.py", line 722, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/home/archeron/dev/repos/eeg_to_music/transformer_tts_master/module.py", line 278, in forward
+    result, attns = self.multihead(key, value, query, mask=mask, query_mask=query_mask)
+  File "/home/archeron/anaconda3/lib/python3.7/site-packages/torch/nn/modules/module.py", line 722, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/home/archeron/dev/repos/eeg_to_music/transformer_tts_master/module.py", line 205, in forward
+    attn = t.bmm(query, key.transpose(1, 2))
+RuntimeError: CUDA out of memory. Tried to allocate 2.09 GiB (GPU 0; 3.95 GiB total capacity; 2.37 GiB already allocated; 139.94 MiB free; 2.91 GiB reserved in total by PyTorch)
+Processing at epoch 0:   0%|
+
+
+Traceback (most recent call last):
+  File "train_transformer.py", line 128, in <module>
+    main()
+  File "train_transformer.py", line 58, in main
+    mel_pred, postnet_pred, attn_probs, stop_preds, attns_enc, attns_dec = m.forward(eeg_array, mel_input, pos_eeg_signal, pos_mel)
+  File "/home/archeron/anaconda3/lib/python3.7/site-packages/torch/nn/parallel/data_parallel.py", line 153, in forward
+    return self.module(*inputs[0], **kwargs[0])
+  File "/home/archeron/anaconda3/lib/python3.7/site-packages/torch/nn/modules/module.py", line 722, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/home/archeron/dev/repos/eeg_to_music/transformer_tts_master/network.py", line 22, in forward
+    memory, c_mask, attns_enc = self.encoder.forward(eeg_array, pos=pos_eeg_signal)
+  File "/home/archeron/dev/repos/eeg_to_music/transformer_tts_master/network.py", line 87, in forward
+    x, attn = layer(x, x, mask=mask, query_mask=c_mask)
+  File "/home/archeron/anaconda3/lib/python3.7/site-packages/torch/nn/modules/module.py", line 722, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/home/archeron/dev/repos/eeg_to_music/transformer_tts_master/module.py", line 264, in forward
+    query_mask = query_mask.repeat(self.h, 1, 1)
+RuntimeError: CUDA error: device-side assert triggered
+Processing at epoch 0:   0%|  
+
+----
+
+archeron@devbox:~/dev/repos/eeg_to_music/transformer_tts_master$ python train_transformer.py 
+preprocess.py packages imported...
+module.py packages imported...
+network.py packages imported...
+train_transformer.py packages imported...
+starting here...
+at get_dataset()
+at epoch 0
+  0%|                                                                                                                                                                  | 0/120 [00:00<?, ?it/s]
+
+at _prepare_eeg_data()
+max length:  9252
+input_array shape:  9252
+input_array shape:  41
+
+eeg prep arr shape:   (2, 69, 9252)
+mel prep arr shape:   (2, 976, 80)
+mel_input prep arr shape:   (2, 976, 80)
+pos_mel prep arr shape:   (2, 976)
+pos_eeg prep arr shape:   (2, 9252)
+
+Processing at epoch 0:   0%|                                                                                                                                           | 0/120 [00:00<?, ?it/s]
+
+c_mask shape:  torch.Size([2, 9252])
+mask shape:  torch.Size([2, 69, 9252])
+
+at _prepare_eeg_data()
+max length:  4905
+input_array shape:  4905
+input_array shape:  42
+
+eeg prep arr shape:   (2, 69, 4905)
+mel prep arr shape:   (2, 745, 80)
+mel_input prep arr shape:   (2, 745, 80)
+pos_mel prep arr shape:   (2, 745)
+pos_eeg prep arr shape:   (2, 4905)
+
+at _prepare_eeg_data()
+max length:  10525
+input_array shape:  10525
+input_array shape:  6158
+
+eeg prep arr shape:   (2, 69, 10525)
+mel prep arr shape:   (2, 976, 80)
+mel_input prep arr shape:   (2, 976, 80)
+pos_mel prep arr shape:   (2, 976)
+pos_eeg prep arr shape:   (2, 10525)
+
+encprenet out shape:  torch.Size([2, 9252, 256])
+pos emb shape:  torch.Size([2, 9252, 256])
+pos emb add shape:  torch.Size([2, 9252, 256])
+after pos dropout shape:  torch.Size([2, 9252, 256])
+atn loop
+x shape before layer:  torch.Size([2, 9252, 256])
+
+/opt/conda/conda-bld/pytorch_1595629403081/work/aten/src/THC/THCTensorIndex.cu:272: indexSelectLargeIndex: block: [22,0,0], thread: [0,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/opt/conda/conda-bld/pytorch_1595629403081/work/aten/src/THC/THCTensorIndex.cu:272: indexSelectLargeIndex: block: [22,0,0], thread: [1,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/opt/conda/conda-bld/pytorch_1595629403081/work/aten/src/THC/THCTensorIndex.cu:272: indexSelectLargeIndex: block: [22,0,0], thread: [2,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/opt/conda/conda-bld/pytorch_1595629403081/work/aten/src/THC/THCTensorIndex.cu:272: indexSelectLargeIndex: block: [22,0,0], thread: [3,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/opt/conda/conda-bld/pytorch_1595629403081/work/aten/src/THC/THCTensorIndex.cu:272: indexSelectLargeIndex: block: [22,0,0], thread: [4,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/opt/conda/conda-bld/pytorch_1595629403081/work/aten/src/THC/THCTensorIndex.cu:272: indexSelectLargeIndex: block: [22,0,0], thread: [5,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/opt/conda/conda-bld/pytorch_1595629403081/work/aten/src/THC/THCTensorIndex.cu:272: indexSelectLargeIndex: block: [22,0,0], thread: [6,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/opt/conda/conda-bld/pytorch_1595629403081/work/aten/src/THC/THCTensorIndex.cu:272: indexSelectLargeIndex: block: [22,0,0], thread: [7,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/opt/conda/conda-bld/pytorch_1595629403081/work/aten/src/THC/THCTensorIndex.cu:272: indexSelectLargeIndex: block: [22,0,0], thread: [8,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/opt/conda/conda-bld/pytorch_1595629403081/work/aten/src/THC/THCTensorIndex.cu:272: indexSelectLargeIndex: block: [22,0,0], thread: [9,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/opt/conda/conda-bld/pytorch_1595629403081/work/aten/src/THC/THCTensorIndex.cu:272: indexSelectLargeIndex: block: [22,0,0], thread: [10,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/opt/conda/conda-bld/pytorch_1595629403081/work/aten/src/THC/THCTensorIndex.cu:272: indexSelectLargeIndex: block: [22,0,0], thread: [11,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/opt/conda/conda-bld/pytorch_1595629403081/work/aten/src/THC/THCTensorIndex.cu:272: indexSelectLargeIndex: block: [22,0,0], thread: [12,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/opt/conda/conda-bld/pytorch_1595629403081/work/aten/src/THC/THCTensorIndex.cu:272: indexSelectLargeIndex: block: [22,0,0], thread: [13,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/opt/conda/conda-bld/pytorch_1595629403081/work/aten/src/THC/THCTensorIndex.cu:272: indexSelectLargeIndex: block: [22,0,0], thread: [14,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/opt/conda/conda-bld/pytorch_1595629403081/work/aten/src/THC/THCTensorIndex.cu:272: indexSelectLargeIndex: block: [22,0,0], thread: [15,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/opt/conda/conda-bld/pytorch_1595629403081/work/aten/src/THC/THCTensorIndex.cu:272: indexSelectLargeIndex: block: [22,0,0], thread: [16,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/opt/conda/conda-bld/pytorch_1595629403081/work/aten/src/THC/THCTensorIndex.cu:272: indexSelectLargeIndex: block: [22,0,0], thread: [17,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/opt/conda/conda-bld/pytorch_1595629403081/work/aten/src/THC/THCTensorIndex.cu:272: indexSelectLargeIndex: block: [22,0,0], thread: [18,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/opt/conda/conda-bld/pytorch_1595629403081/work/aten/src/THC/THCTensorIndex.cu:272: indexSelectLargeIndex: block: [22,0,0], thread: [19,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/opt/conda/conda-bld/pytorch_1595629403081/work/aten/src/THC/THCTensorIndex.cu:272: indexSelectLargeIndex: block: [22,0,0], thread: [20,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/opt/conda/conda-bld/pytorch_1595629403081/work/aten/src/THC/THCTensorIndex.cu:272: indexSelectLargeIndex: block: [22,0,0], thread: [21,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/opt/conda/conda-bld/pytorch_1595629403081/work/aten/src/THC/THCTensorIndex.cu:272: indexSelectLargeIndex: block: [22,0,0], thread: [22,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/opt/conda/conda-bld/pytorch_1595629403081/work/aten/src/THC/THCTensorIndex.cu:272: indexSelectLargeIndex: block: [22,0,0], thread: [23,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/opt/conda/conda-bld/pytorch_1595629403081/work/aten/src/THC/THCTensorIndex.cu:272: indexSelectLargeIndex: block: [22,0,0], thread: [24,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/opt/conda/conda-bld/pytorch_1595629403081/work/aten/src/THC/THCTensorIndex.cu:272: indexSelectLargeIndex: block: [22,0,0], thread: [25,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/opt/conda/conda-bld/pytorch_1595629403081/work/aten/src/THC/THCTensorIndex.cu:272: indexSelectLargeIndex: block: [22,0,0], thread: [26,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/opt/conda/conda-bld/pytorch_1595629403081/work/aten/src/THC/THCTensorIndex.cu:272: indexSelectLargeIndex: block: [22,0,0], thread: [27,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/opt/conda/conda-bld/pytorch_1595629403081/work/aten/src/THC/THCTensorIndex.cu:272: indexSelectLargeIndex: block: [22,0,0], thread: [28,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/opt/conda/conda-bld/pytorch_1595629403081/work/aten/src/THC/THCTensorIndex.cu:272: indexSelectLargeIndex: block: [22,0,0], thread: [29,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/opt/conda/conda-bld/pytorch_1595629403081/work/aten/src/THC/THCTensorIndex.cu:272: indexSelectLargeIndex: block: [22,0,0], thread: [30,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/opt/conda/conda-bld/pytorch_1595629403081/work/aten/src/THC/THCTensorIndex.cu:272: indexSelectLargeIndex: block: [22,0,0], thread: [31,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+Traceback (most recent call last):
+  File "train_transformer.py", line 126, in <module>
+    main()
+  File "train_transformer.py", line 56, in main
+    mel_pred, postnet_pred, attn_probs, stop_preds, attns_enc, attns_dec = m.forward(eeg_array, mel_input, pos_eeg_signal, pos_mel)
+  File "/home/archeron/anaconda3/lib/python3.7/site-packages/torch/nn/parallel/data_parallel.py", line 153, in forward
+    return self.module(*inputs[0], **kwargs[0])
+  File "/home/archeron/anaconda3/lib/python3.7/site-packages/torch/nn/modules/module.py", line 722, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/home/archeron/dev/repos/eeg_to_music/transformer_tts_master/network.py", line 22, in forward
+    memory, c_mask, attns_enc = self.encoder.forward(eeg_array, pos=pos_eeg_signal)
+  File "/home/archeron/dev/repos/eeg_to_music/transformer_tts_master/network.py", line 78, in forward
+    x, attn = layer(x, x, mask=mask, query_mask=c_mask)
+  File "/home/archeron/anaconda3/lib/python3.7/site-packages/torch/nn/modules/module.py", line 722, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/home/archeron/dev/repos/eeg_to_music/transformer_tts_master/module.py", line 264, in forward
+    query_mask = query_mask.repeat(self.h, 1, 69)
+RuntimeError: CUDA error: device-side assert triggered
+Processing at epoch 0:   0%| 
+
+
+------------------------------------------------------------------
+
+train_transformer
+
+dataset:
+
+get_dataset -> preprocess.py
+
+	returns LJDatasets class instance 
+		LJDatasets(os.path.join(hp.data_path,'metadata.csv'), os.path.join(hp.data_path,'wavs'))
+
+{	
+    wav_name = os.path.join(self.root_dir, self.landmarks_frame.ix[idx, 0]) + '.wav'
+
+# replace with eeg
+# find what exactly is in the landmarks_frame
+    text = self.landmarks_frame.ix[idx, 1]
+
+# this will be replaced/substituted
+    text = np.asarray(text_to_sequence(text, [hp.cleaners]), dtype=np.int32)
+
+#same
+    mel = np.load(wav_name[:-4] + '.pt.npy')
+   
+# silence padding at end and beginning. 
+# evaluate below mel_input expr to confirm if padding is at both beginning and end
+    mel_input = np.concatenate([np.zeros([1,hp.num_mels], np.float32), mel[:-1,:]], axis=0)
+
+# same, but for eeg input/ operation most likely will be the same
+# used for dimension sizing in the dataloader in collate_fn_transformer
+    text_length = len(text)
+
+# np.arange returns same as range, but ndarray instead of a list type
+# eg.  np.arange(3,7) = array([3, 4, 5, 6])
+    pos_text = np.arange(1, text_length + 1)
+    pos_mel = np.arange(1, mel.shape[0] + 1)
+
+    sample = {'text': text, 'mel': mel, 'text_length':text_length, 'mel_input':mel_input, 'pos_mel':pos_mel, 'pos_text':pos_text}
+
+    return sample
+}
+
+
+character, mel, mel_input, pos_text, pos_mel, _ = data
+
+
+# dataloader uses this transform; data ^ is after applying this method
+def collate_fn_transformer(batch):
+
+    # Puts each data field into a tensor with outer dimension batch size
+    if isinstance(batch[0], collections.Mapping):
+
+# opens up all the dicts and pushes field wise into a list
+
+        text = [d['text'] for d in batch]
+        mel = [d['mel'] for d in batch]
+        mel_input = [d['mel_input'] for d in batch]
+        text_length = [d['text_length'] for d in batch]
+        pos_mel = [d['pos_mel'] for d in batch]
+        pos_text= [d['pos_text'] for d in batch]
+
+# list is then sorted largest to shortest based on text_length field
+        
+        text = [i for i,_ in sorted(zip(text, text_length), key=lambda x: x[1], reverse=True)]
+        mel = [i for i, _ in sorted(zip(mel, text_length), key=lambda x: x[1], reverse=True)]
+        mel_input = [i for i, _ in sorted(zip(mel_input, text_length), key=lambda x: x[1], reverse=True)]
+        pos_text = [i for i, _ in sorted(zip(pos_text, text_length), key=lambda x: x[1], reverse=True)]
+        pos_mel = [i for i, _ in sorted(zip(pos_mel, text_length), key=lambda x: x[1], reverse=True)]
+        text_length = sorted(text_length, reverse=True)
+
+        # PAD sequences with largest length of the batch
+        text = _prepare_data(text).astype(np.int32)
+        mel = _pad_mel(mel)
+        mel_input = _pad_mel(mel_input)
+        pos_mel = _prepare_data(pos_mel).astype(np.int32)
+        pos_text = _prepare_data(pos_text).astype(np.int32)
+
+
+        return t.LongTensor(text), t.FloatTensor(mel), t.FloatTensor(mel_input), t.LongTensor(pos_text), t.LongTensor(pos_mel), t.LongTensor(text_length)
+
+    raise TypeError(("batch must contain tensors, numbers, dicts or lists; found {}"
+                     .format(type(batch[0]))))
+
+
+
+
+
+
+dependencies installed for this in main environment (06/05/21 - 20:21)
+
+pip install librosa
+pip install unidecode
+pip install inflect
+pip install tensorboardX
+
+-------
+
+LJDatasets
+
+archeron@devbox:~$ head -n 5 dev/data/tempkhela/LJSpeech-1.1/metadata.csv 
+
+LJ001-0013|than in the same operations with ugly ones.|than in the same operations with ugly ones.
+
+LJ001-0025|imitates a much freer hand, simpler, rounder, and less spiky, and therefore far pleasanter and easier to read.|imitates a much freer hand, simpler, rounder, and less spiky, and therefore far pleasanter and easier to read.
+
+LJ001-0117|which title can only be claimed by artistic practice, whether the art in it be conscious or unconscious.|which title can only be claimed by artistic practice, whether the art in it be conscious or unconscious.
+
+LJ001-0149|From the time when books first took their present shape till the end of the sixteenth century, or indeed later,|From the time when books first took their present shape till the end of the sixteenth century, or indeed later,
+
+LJ002-0038|"Of these wards, three were appropriated to the ""cabin side,"" so called because"|"Of these wards, three were appropriated to the ""cabin side,"" so called because"
+
+
+
+
+-------------------
+
+14/5 1330
+
+changes:
+
+#1
+preprocess
+
+ljdatasets class 37
+
+    def __getitem__(self, idx):
+        wav_name = os.path.join(self.root_dir, self.landmarks_frame.loc[idx, 0]) + '.wav'
+        text = self.landmarks_frame.loc[idx, 1]
+
+        text = np.asarray(text_to_sequence(text, [hp.cleaners]), dtype=np.int32)
+        mel = np.load(wav_name[:-4] + '.pt.npy')
+
+
+
+
+
+preprocess.py
+line 90
+
+collate_fn_transformer()
+    text -> prepare 
+
+
+
+------
+
+for managing large numpy arrays;
+    will be useful when scaling the training
+
+https://stackoverflow.com/questions/30329726/fastest-save-and-load-options-for-a-numpy-array
